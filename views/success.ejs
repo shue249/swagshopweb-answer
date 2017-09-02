@@ -11,7 +11,7 @@
             var purchasedItems = <%- JSON.stringify(purchasedItems) %>;
             var content_ids = cart.getCartItemIdsAsList(purchasedItems);
             var value = cart.getTotalPrice(purchasedItems);
-            var currency = currency: purchasedItems[0].product.currency;
+            var currency = purchasedItems[0].product.currency;
 
             //TODO - Dynamic Ads, Exercise 4c, implement Purchase
             fbq('track', 'Purchase', {
