@@ -3,7 +3,7 @@ var cart = {
     'add': function(product, onSuccess) {
         var content_ids = [product.id];
         var value = product.price;
-        var currency: product.currency;
+        var currency = product.currency;
 
         //TODO - Dynamic Ads, Exercise 4b, implement AddToCart 
         fbq('track', 'AddToCart', {
