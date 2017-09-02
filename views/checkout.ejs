@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <% include partials/header %>
+
+    <script type="text/javascript" src="/js/cart.js"></script>
+
+    <script type="text/javascript">        
+        function showNumberOfItems(cartItems) {
+            var numberOfItems = cart.getNumberOfItems(cartItems);
+            var displayText = 'Number of Items = ' + numberOfItems;
+            document.getElementById('div-number-of-items').innerHTML = displayText;      
+        }
+
+        function showTotalPrice(cartItems) {
+            var totalPrice = cart.getTotalPrice(cartItems).toFixed(2);
+            var displayText = 'Total Price = ' + totalPrice;
+            document.getElementById('div-total-price').innerHTML = displayText;      
+        }  
+
+        function reupdateSequenceNo() {
+            var table = document.getElementById('table-cartitems');
+            for (i = 1; i < table.rows.length; i++) {
+                var row = table.rows[i];
+                var sequenceNoCell = row.cells[0];
+                sequenceNoCell.innerHTML = (i);
+            }
+        }      
+    </script>   
+
+    <script type="text/javascript">          
+        <% if (cartItems.length > 0) {%>            
+            var cartItems = <%- JSON.stringify(cartItems) %>;
+            var content_ids = cart.getCartItemIdsAsList(cartItems);
+            var value = cart.getTotalPrice(cartItems);
+            var currency = cartItems[0].product.currency;
+            
+            //TODO - Dynamic Ads, Exercise 5, implement firing of InitiateCheckout
+            fbq('track', 'InitiateCheckout', {
+                content_type: 'product',
+                content_ids: content_ids,
+                value: value,
+                currency: currency
+            });
+        <% } %>
+    </script> 
+</head>
+
+<body>
+    <% include partials/menubar.ejs %>  
+
+    <!-- Page Content -->
+    <div class="container">
+        <!-- Title -->
+        <div class="row">
+            <div class="col-lg-12">
+                <h3>Checkout</h3>
+            </div>
+        </div>
+        <!-- /.row -->
+
+        <!-- Page Features -->
+        <div class="row text-center">
+            <table id = "table-cartitems" width="100%" cellpadding="25">
+                <tr style="font-weight:bold" bgcolor="#d3d3d3" >
+                    <td>S/No</td>
+                    <td>Name</td>
+                    <td>Quantity</td>
+                    <td align="right">Unit Price</td>
+                    <td align="right">Item Total</td>
+                    <td>Remove</td>
+                </tr>
+                <% for (i = 0; i < cartItems.length; i++) {%>
+                    <tr id="row-<%= cartItems[i].product.id %>">
+                        <td><%= (i+1) %></td>
+                        <td><%= cartItems[i].product.name %></td>
+                        <td><%= cartItems[i].qty %></td>
+                        <td align="right">$<%= cartItems[i].product.price.toFixed(2) %></td>
+                        <td align="right">$<%= cartItems[i].itemTotal.toFixed(2) %></td>
+                        <td>
+                            <button class="btn"
+                                onclick="cart.remove('<%= cartItems[i].product.id %>', 
+                                    function(json) { 
+                                        showNumberOfItems(json.cartItems);
+                                        showTotalPrice(json.cartItems);
+                                        var row = document.getElementById('row-<%= cartItems[i].product.id %>');
+                                        row.parentNode.removeChild(row);                                        
+                                        reupdateSequenceNo();
+                                    });">
+                                Remove
+                            </button>
+                        </td>
+                    </tr>
+                <% } %>                
+            <table>   
+            <hr>
+            <div class="col-md-4 col-sm-6 hero-feature">
+                <div id="div-number-of-items" class="thumbnail" width="30%">
+                    Number of Items:
+                </div>    
+            </div> 
+            <div class="col-md-4 col-sm-6 hero-feature">
+                <div id="div-total-price" class="thumbnail" width="30%">
+                    Total Price:
+                </div>    
+            </div>             
+        </div>
+
+        <script type="text/javascript">
+            showNumberOfItems(<%- JSON.stringify(cartItems) %>);
+            showTotalPrice(<%- JSON.stringify(cartItems) %>);
+        </script>
+        <!-- /.row -->
+
+        <br>
+
+        <button id="btn-purchse" class="btn btn-primary btn-lg btn-block" onclick="location.href='/purchase'">Buy Now</button>
+        <hr>
+        <a href="/" class="btn btn-lg btn-info">Return to Swag Store</a>
+        <hr>        
+        <% include partials/footer.ejs %>
+    </div>
+</body>
+
+</html>

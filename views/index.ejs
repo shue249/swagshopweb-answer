@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <% include partials/header.ejs %>
+
+    <script type="text/javascript" src="/js/cart.js"></script>
+
+    <script type="text/javascript">      
+        function refreshCheckoutButtonDisplay(cartItems) {
+            var numberOfItems = cart.getNumberOfItems(cartItems);
+            var totalPrice = cart.getTotalPrice(cartItems).toFixed(2);
+            var displayText = 'Check Out - ' + numberOfItems + ' item' + ((numberOfItems > 1) ? 's' : '') + ' ($' + totalPrice + ')';
+            document.getElementById('btn-checkout').innerHTML = displayText;      
+        }
+    </script>
+</head>
+
+<body>
+    <% include partials/menubar.ejs %>
+
+    <!-- Page Content -->
+    <div class="container">
+        <!-- Title -->
+        <div class="row">
+            <div class="col-lg-12">
+                <h3>All Swags</h3>
+            </div>
+        </div>
+        <!-- /.row -->
+
+        <!-- Page Features -->
+        <div class="row text-center">
+            <% products.forEach(function(product) { %>
+                <div class="col-md-4 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <a href="/product?id=<%= product.id %>"><img src="<%= product.image %>" class="img-rounded" alt=""></a>
+                    <div class="caption">
+                        <h3><%= product.name %></h3>
+                        <h3 class="bg-info">$<%= product.price %> <%= product.currency %></h3></p>                        
+                        <script type="text/javascript">
+                            // stores the product before passing in to cart.add() due to double quotes in onclick
+                            var product_<%= product.id %> = <%- JSON.stringify(product) %>                            
+                        </script>
+                        <button class="btn btn-primary btn-lg btn-block" 
+                                onclick="cart.add(product_<%= product.id %>, function(json) { refreshCheckoutButtonDisplay(json.cartItems); alert('<%= product.name %> added to cart')});">
+                            Add To Cart
+                        </button>
+                    </div>
+                </div>
+                </div>            
+            <% }); %>
+        </div>
+        <!-- /.row -->
+
+        <button id="btn-checkout" class="btn btn-primary btn-lg btn-block" onclick="location.href='/checkout'">Check Out</button>
+        <script type="text/javascript">
+            refreshCheckoutButtonDisplay(<%- JSON.stringify(cartItems) %>);
+        </script>
+        <hr>
+        <% include partials/footer.ejs %>
+    </div>
+</body>
+
+</html>
